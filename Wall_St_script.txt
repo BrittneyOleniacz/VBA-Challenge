@@ -1,0 +1,131 @@
+Sub main()
+
+'Variables
+Set ws = ActiveSheet
+
+
+'Loop through worksheets
+For Each ws In Worksheets
+
+'Add Column headers
+    ws.Cells(1, 9).Value = "Ticker"
+    ws.Cells(1, 10).Value = "Yearly Change"
+    ws.Cells(1, 11).Value = "Percent Change"
+    ws.Cells(1, 12).Value = "Total Stock Volume"
+    'Ajust Cell Width
+    ws.Cells.Columns.AutoFit
+    ws.Range("A1", "L1").Font.Bold = True
+ 
+'Assign Data type and intialize
+Dim index As Integer
+    index = 2
+Dim stock_volume As Double
+Dim ticker_symbol As String
+Dim yr_change As Double
+Dim per_Change As Double
+Dim opening_price As Double
+Dim closing_price As Double
+    stock_volume = 2
+
+    'Starting opening_price
+    opening_price = ws.Range("C2").Value
+
+'Loop through rows
+For i = 2 To ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+    If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+    
+    ticker_symbol = ws.Cells(i, 1).Value
+    
+    stock_volume = stock_volume + ws.Cells(i, 7).Value
+    
+    'Define closing_price
+    closing_price = ws.Range("F" & i).Value
+        
+    yr_change = closing_price - opening_price
+    
+    'percent_change
+        If opening_price = 0 Then
+        per_Change = 0
+        Else
+            per_Change = yr_change / opening_price
+        End If
+
+    'Update opening price
+    opening_price = ws.Range("C" & (i + 1)).Value
+    
+      'Assign locality and format of collecte data
+        ws.Cells(index, 9).Value = ticker_symbol
+        ws.Cells(index, 12).Value = stock_volume
+        ws.Cells(index, 10).Value = yr_change
+        ws.Cells(index, 10).NumberFormat = "#,#00.00"
+        ws.Cells(index, 11).Value = per_Change
+        ws.Cells(index, 11).NumberFormat = "0.00%"
+        stock_volume = 0
+    index = index + 1
+
+    End If
+Next i
+
+'Conditional formatting
+For i = 2 To ws.Cells(Rows.Count, 1).End(xlUp).Row
+        If ws.Cells(i, 10).Value < 0 Then
+            ws.Cells(i, 10).Interior.ColorIndex = "3"
+            ElseIf ws.Cells(i, 10).Value > 0 Then
+                ws.Cells(i, 10).Interior.ColorIndex = "4"
+        End If
+Next i
+
+Next ws
+
+
+'--------------
+'##Challenge##
+'--------------
+
+'Column headers
+    Cells(1, 15).Value = "Ticker"
+    Cells(1, 16).Value = "Value"
+    Cells(2, 14).Value = "Greatest % Increase"
+    Cells(3, 14).Value = "Greatest % Decrease"
+    Cells(4, 14).Value = "Greatest Total Volume"
+'Formatting
+Cells(2, 16).NumberFormat = "0.00%"
+Cells(3, 16).NumberFormat = "0.00%"
+Range("O1", "P1").Font.Bold = True
+Range("N2", "N4").Font.Bold = True
+Cells.Columns.AutoFit
+
+'Greatest % increase value
+Cells(2, 16).Formula = "=MAX(K:K)"
+'Greatest % increase ticker
+Cells(2, 15).Formula = "=INDEX(I:I, MATCH(P2, K:K, FALSE), 1)"
+
+'Greatest % decrease
+Cells(3, 16).Formula = "=MIN(K:K)"
+Cells(3, 15).Formula = "=INDEX(I:I, MATCH(P3, K:K, FALSE), 1)"
+
+'Greatest Total Stock Vol
+Cells(4, 16).Formula = "=MAX(L:L)"
+Cells(4, 15).Formula = "=INDEX(I:I, MATCH(P4, L:L, FALSE), 1)"
+
+
+
+
+End Sub
+
+'       :) :) :)
+
+
+'--------
+'Sources:
+'--------
+'https://www.excelhowto.com/macros/formatting-a-range-of-cells-in-excel-vba/
+'https://docs.microsoft.com/en-us/office/vba/api/excel.colorindex
+'https://docs.microsoft.com/en-us/office/vba/api/excel.numberformat
+'https://www.mrexcel.com/excel-tips/excel-vlookup-index-match/
+'https://www.automateexcel.com/vba/worksheet-functions-in-macro/
+'https://stackoverflow.com/questions/6045826/excel-vba-function-to-turn-activecell-to-bold#:~:text=Bold%20%3D%20true%3B,%2Dcells%2Dfont%20into%20bold.
+'https://stackoverflow.com/questions/24154232/vba-to-select-all-columns-in-a-worksheet-and-auto-adjust-all-columns-width-in-ex
+'https://powerspreadsheets.com/excel-vba-column-width/#1-Set-Column-Width
+
